@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animal Tables</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Image styling */
+    .pic {
+      width: 100px;
+      height: 100px;
+      border: 3px solid #333;
+      transition: transform 0.3s ease;
+    }
+    .pic:hover {
+      transform: scale(1.5);
+    }
+    .bold {
+      font-weight: bold;
+    }
+    .blue {
+      font-weight: bold;
+      font-style: italic;
+      color: blue;
+    }
+    .myTable {
+      margin: 20px;
+    }
+    .myTable th {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="my-4">Animal Tables</h2>
+
+    <!-- Big Cats Table -->
+    <div class="myTable">
+      <h3>Big Cats</h3>
+      <table id="bigCats" class="table table-bordered">
+        <thead>
+          <tr>
+            <th onclick="sortStuff('bigCats', 0)">Species</th>
+            <th onclick="sortStuff('bigCats', 1)">Name</th>
+            <th onclick="sortStuff('bigCats', 2)">Size</th>
+            <th onclick="sortStuff('bigCats', 3)">Location</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Content goes here -->
+        </tbody>
+      </table>
+      <button class="btn btn-primary" onclick="addAnimal('bigCats')">Add Big Cat</button>
+    </div>
+
+    <!-- Dogs Table -->
+    <div class="myTable">
+      <h3>Dogs</h3>
+      <table id="dogs" class="table table-bordered">
+        <thead>
+          <tr>
+            <th onclick="sortStuff('dogs', 0)">Species</th>
+            <th onclick="sortStuff('dogs', 1)">Name</th>
+            <th onclick="sortStuff('dogs', 2)">Size</th>
+            <th onclick="sortStuff('dogs', 3)">Location</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Content goes here -->
+        </tbody>
+      </table>
+      <button class="btn btn-primary" onclick="addAnimal('dogs')">Add Dog</button>
+    </div>
+
+    <!-- Big Fish Table -->
+    <div class="myTable">
+      <h3>Big Fish</h3>
+      <table id="fishies" class="table table-bordered">
+        <thead>
+          <tr>
+            <th onclick="sortStuff('fishies', 0)">Species</th>
+            <th onclick="sortStuff('fishies', 1)">Name</th>
+            <th onclick="sortStuff('fishies', 2)">Size</th>
+            <th onclick="sortStuff('fishies', 3)">Location</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Content goes here -->
+        </tbody>
+      </table>
+      <button class="btn btn-primary" onclick="addAnimal('fishies')">Add Big Fish</button>
+    </div>
+  </div>
+
+  <!-- Modal for adding/editing -->
+  <div class="modal" id="animalModal" tabindex="-1" role="dialog" aria-labelledby="animalModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="animalModalLabel">Add Animal</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="animalForm">
+            <div class="form-group">
+              <label for="animalName">Name</label>
+              <input type="text" class="form-control" id="animalName" required>
+            </div>
+            <div class="form-group">
+              <label for="animalSize">Size</label>
+              <input type="text" class="form-control" id="animalSize" required>
+            </div>
+            <div class="form-group">
+              <label for="animalLocation">Location</label>
+              <input type="text" class="form-control" id="animalLocation" required>
+            </div>
+            <div class="form-group">
+              <label for="animalImage">Image URL</label>
+              <input type="url" class="form-control" id="animalImage" placeholder="https://via.placeholder.com/100">
+            </div>
+            <input type="hidden" id="animalIndex">
+            <input type="hidden" id="animalType">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="saveBtn">Save Animal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Animal Modal -->
+  <div class="modal" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">Delete Animal</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this animal?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.5/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    const cats = [
+      { species: 'Big Cats', name: 'Tiger', size: '10 ft', location: 'Asia', image: 'https://via.placeholder.com/100' },
+      { species: 'Big Cats', name: 'Lion', size: '8 ft', location: 'Africa', image: 'https://via.placeholder.com/100' },
+      { species: 'Big Cats', name: 'Leopard', size: '5 ft', location: 'Africa and Asia', image: 'https://via.placeholder.com/100' },
+    ];
+
+    const dogs = [
+      { species: 'Dog', name: 'Rottweiler', size: '2 ft', location: 'Germany', image: 'https://via.placeholder.com/100' },
+      { species: 'Dog', name: 'German Shepherd', size: '2.5 ft', location: 'Germany', image: 'https://via.placeholder.com/100' },
+      { species: 'Dog', name: 'Golden Retriever', size: '2 ft', location: 'USA', image: 'https://via.placeholder.com/100' },
+    ];
+
+    const fishies = [
+      { species: 'Big Fish', name: 'Shark', size: '20 ft', location: 'Oceans', image: 'https://via.placeholder.com/100' },
+      { species: 'Big Fish', name: 'Whale', size: '60 ft', location: 'Oceans', image: 'https://via.placeholder.com/100' },
+    ];
+
+    // Render table rows
+    function showStuff(tableId, data, animalType) {
+      const tableBody = document.querySelector(`#${tableId} tbody`);
+      tableBody.innerHTML = '';
+      data.forEach((item, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.species}</td>
+          <td class="${animalType === 'fishies' ? 'blue' : 'bold'}">${item.name}</td>
+          <td>${item.size}</td>
+          <td>${item.location}</td>
+          <td>
+            <img src="${item.image}" alt="${item.name}" class="pic" onclick="showImage('${item.image}')">
+            <button class="btn btn-warning btn-sm" onclick="editStuff(${i}, '${animalType}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStuff(${i}, '${animalType}')">Delete</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Sort columns
+    function sortStuff(animalType, columnIndex) {
+      let data;
+      if (animalType === 'bigCats') data = [...cats];
+      else if (animalType === 'dogs') data = [...dogs];
+      else data = [...fishies];
+
+      data.sort((a, b) => {
+        const valA = Object.values(a)[columnIndex];
+        const valB = Object.values(b)[columnIndex];
+        return valA > valB ? 1 : valA < valB ? -1 : 0;
+      });
+
+      showStuff(animalType === 'bigCats' ? 'bigCats' : animalType === 'dogs' ? 'dogs' : 'fishies', data, animalType);
+    }
+
+    // Add new animal
+    function addAnimal(animalType) {
+      document.getElementById('animalModalLabel').textContent = `Add ${animalType.charAt(0).toUpperCase() + animalType.slice(1)}`;
+      document.getElementById('animalType').value = animalType;
+      document.getElementById('animalForm').reset();
+      $('#animalModal').modal('show');
+    }
+
+    // Show image in modal
+    function showImage(imgUrl) {
+      const modalContent = `
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Animal Image</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <img src="${imgUrl}" class="img-fluid" alt="Enlarged Image">
+          </div>
+        </div>
+      `;
+      $('#imageModal').html(modalContent);
+      $('#imageModal').modal('show');
+    }
+
+    // Edit animal
+    function editStuff(index, animalType) {
+      const data = animalType === 'bigCats' ? cats : animalType === 'dogs' ? dogs : fishies;
+      const animal = data[index];
+      document.getElementById('animalName').value = animal.name;
+      document.getElementById('animalSize').value = animal.size;
+      document.getElementById('animalLocation').value = animal.location;
+      document.getElementById('animalImage').value = animal.image;
+      document.getElementById('animalIndex').value = index;
+      document.getElementById('animalType').value = animalType;
+      document.getElementById('animalModalLabel').textContent = `Edit ${animalType.charAt(0).toUpperCase() + animalType.slice(1)}`;
+      $('#animalModal').modal('show');
+    }
+
+    // Save animal to list
+    document.getElementById('saveBtn').onclick = function() {
+      const name = document.getElementById('animalName').value;
+      const size = document.getElementById('animalSize').value;
+      const location = document.getElementById('animalLocation').value;
+      const image = document.getElementById('animalImage').value;
+      const index = document.getElementById('animalIndex').value;
+      const type = document.getElementById('animalType').value;
+
+      const newAnimal = { species: type, name, size, location, image };
+
+      if (index === "") {
+        if (type === 'bigCats') {
+          cats.push(newAnimal);
+        } else if (type === 'dogs') {
+          dogs.push(newAnimal);
+        } else {
+          fishies.push(newAnimal);
+        }
+      } else {
+        if (type === 'bigCats') {
+          cats[index] = newAnimal;
+        } else if (type === 'dogs') {
+          dogs[index] = newAnimal;
+        } else {
+          fishies[index] = newAnimal;
+        }
+      }
+
+      showStuff(type === 'bigCats' ? 'bigCats' : type === 'dogs' ? 'dogs' : 'fishies', type === 'bigCats' ? cats : type === 'dogs' ? dogs : fishies, type);
+      $('#animalModal').modal('hide');
+    };
+
+    // Delete animal
+    function deleteStuff(index, animalType) {
+      document.getElementById('deleteConfirmBtn').onclick = function() {
+        removeAnimal(index, animalType);
+        $('#deleteModal').modal('hide');
+      };
+      $('#deleteModal').modal('show');
+    }
+
+    function removeAnimal(index, animalType) {
+      if (animalType === 'bigCats') {
+        cats.splice(index, 1);
+      } else if (animalType === 'dogs') {
+        dogs.splice(index, 1);
+      } else {
+        fishies.splice(index, 1);
+      }
+      showStuff(animalType === 'bigCats' ? 'bigCats' : animalType === 'dogs' ? 'dogs' : 'fishies', animalType === 'bigCats' ? cats : animalType === 'dogs' ? dogs : fishies, animalType);
+    }
+
+    // Initial Table Render
+    showStuff('bigCats', cats, 'bigCats');
+    showStuff('dogs', dogs, 'dogs');
+    showStuff('fishies', fishies, 'fishies');
+  </script>
+</body>
+</html>
